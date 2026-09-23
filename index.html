@@ -1,549 +1,223 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>DevFolio Ads — Intelligent Systems Engineer</title>
-  <meta name="description" content="Portfolio de Têko Kossi Félix Kangni-Soukpe — Embedded systems, AI & mobile developer" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --primary: #13294B;
-      --accent: #2E6F95;
-      --bg: #F5F7FA;
-      --card: #FFFFFF;
-      --text: #1C1C1E;
-      --grey: #6B7280;
-      --success: #1E9E63;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      font-family: Inter, system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100%;
-      -webkit-font-smoothing: antialiased;
-    }
-    body { padding-bottom: 80px; }
-    header {
-      position: sticky; top: 0; z-index: 40;
-      background: var(--primary); color: #fff;
-      height: 56px; display: flex; align-items: center; justify-content: space-between;
-      padding: 0 16px; box-shadow: 0 2px 8px rgba(0,0,0,.15);
-    }
-    header h1 { font-size: 17px; font-weight: 600; }
-    .lang-btn {
-      background: transparent; border: none; color: #fff; cursor: pointer;
-      padding: 8px; border-radius: 50%; font-size: 20px; line-height: 1;
-    }
-    .lang-btn:hover { background: rgba(255,255,255,.12); }
-    .lang-menu {
-      position: absolute; right: 12px; top: 52px;
-      background: #fff; color: var(--text); border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.12); max-height: 280px; overflow-y: auto;
-      width: 180px; z-index: 50; display: none;
-    }
-    .lang-menu.open { display: block; }
-    .lang-menu button {
-      display: block; width: 100%; text-align: left; padding: 10px 16px;
-      border: none; background: none; font-size: 14px; cursor: pointer;
-    }
-    .lang-menu button:hover, .lang-menu button.active { background: var(--bg); color: var(--primary); font-weight: 600; }
-    main { max-width: 640px; margin: 0 auto; padding: 20px 16px; }
-    .screen { display: none; animation: fadeIn .25s ease; }
-    .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-    /* Home hero */
-    .hero {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-radius: 20px; padding: 24px; color: #fff; margin-bottom: 20px;
-    }
-    .hero-top { display: flex; align-items: center; gap: 14px; }
-    .avatar {
-      width: 64px; height: 64px; border-radius: 16px; overflow: hidden;
-      background: rgba(255,255,255,.15); flex-shrink: 0; position: relative;
-    }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar .fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; }
-    .hero-name { font-weight: 700; font-size: 15px; }
-    .hero-first { color: rgba(255,255,255,.7); font-size: 13px; margin-top: 4px; }
-    .hero h2 { font-size: 20px; font-weight: 700; margin-top: 16px; line-height: 1.3; }
-    .hero .bio { color: rgba(255,255,255,.75); font-size: 14px; line-height: 1.45; margin-top: 10px; }
-    .badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,.15); border-radius: 20px;
-      padding: 6px 12px; margin-top: 16px; font-size: 12px; font-weight: 600;
-    }
-    .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
-
-    .info-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 14px; }
-    .info-row .label { color: var(--grey); font-weight: 600; }
-    .section-title { font-size: 18px; font-weight: 700; margin: 20px 0 12px; }
-
-    .domains { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; }
-    .domain-card {
-      background: var(--card); border-radius: 18px; padding: 14px 8px;
-      text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,.05);
-      height: 128px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .domain-icon {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; margin-bottom: 10px;
-    }
-    .domain-card span { font-size: 11.5px; font-weight: 600; line-height: 1.25; }
-
-    /* Cards */
-    .card {
-      background: var(--card); border-radius: 16px; padding: 16px 18px;
-      margin-bottom: 12px; border: 1px solid rgba(0,0,0,.05);
-      display: flex; gap: 14px; align-items: flex-start;
-      box-shadow: 0 2px 8px rgba(0,0,0,.03);
-    }
-    .card-icon {
-      width: 48px; height: 48px; border-radius: 50%; background: var(--primary);
-      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; flex-shrink: 0;
-    }
-    .card h3 { font-size: 16px; font-weight: 700; }
-    .card p { color: var(--grey); font-size: 14px; line-height: 1.4; margin-top: 6px; }
-
-    /* Tabs */
-    .tabs { display: flex; background: #fff; border-radius: 12px; padding: 4px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
-    .tabs button {
-      flex: 1; border: none; background: none; padding: 10px; border-radius: 10px;
-      font-size: 14px; font-weight: 500; color: var(--grey); cursor: pointer;
-    }
-    .tabs button.active { background: var(--primary); color: #fff; }
-
-    .edu-icon {
-      width: 40px; height: 40px; border-radius: 10px; background: rgba(46,111,149,.1);
-      display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 20px; flex-shrink: 0;
-    }
-    .skill-bar { height: 6px; background: rgba(19,41,75,.08); border-radius: 4px; margin-top: 8px; overflow: hidden; }
-    .skill-bar span { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .6s ease; }
-
-    .lock-banner {
-      display: flex; align-items: center; gap: 8px; background: rgba(19,41,75,.06);
-      color: var(--primary); font-size: 12px; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px;
-    }
-    .grid-media { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (min-width: 500px) { .grid-media { grid-template-columns: 1fr 1fr 1fr; } }
-    .media-item {
-      aspect-ratio: 0.9; border-radius: 14px; overflow: hidden; background: rgba(19,41,75,.08);
-      position: relative; cursor: pointer; border: none; padding: 0;
-    }
-    .media-item img { width: 100%; height: 100%; object-fit: cover; }
-    .media-item .play {
-      position: absolute; inset: 0; background: var(--primary); display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 36px;
-    }
-
-    .contact-btn {
-      display: flex; align-items: center; gap: 14px; width: 100%;
-      background: var(--card); border: 1px solid rgba(0,0,0,.05); border-radius: 14px;
-      padding: 16px; margin-bottom: 12px; cursor: pointer; text-align: left;
-      box-shadow: 0 2px 8px rgba(0,0,0,.03); transition: transform .15s, box-shadow .15s;
-    }
-    .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
-    .contact-btn .ico {
-      width: 40px; height: 40px; border-radius: 10px; background: rgba(19,41,75,.08);
-      display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px;
-    }
-    .contact-btn span { font-weight: 600; font-size: 15px; flex: 1; }
-    .contact-btn .arrow { color: var(--grey); }
-
-    .loading { text-align: center; padding: 48px 0; color: var(--grey); }
-    .spinner {
-      width: 32px; height: 32px; border: 3px solid rgba(19,41,75,.15);
-      border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .empty { text-align: center; color: var(--grey); padding: 40px 0; }
-
-    /* Bottom nav */
-    nav.bottom {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
-      background: #fff; height: 72px; display: flex;
-      box-shadow: 0 -2px 8px rgba(0,0,0,.06); border-top: 1px solid rgba(0,0,0,.04);
-    }
-    nav.bottom button {
-      flex: 1; border: none; background: none; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: var(--grey); font-size: 10.5px;
-    }
-    nav.bottom button.active { color: var(--primary); font-weight: 600; }
-    nav.bottom button .ico { font-size: 22px; line-height: 1; }
-
-    /* Modal */
-    .modal {
-      display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.9);
-      align-items: center; justify-content: center; padding: 16px;
-    }
-    .modal.open { display: flex; }
-    .modal .close {
-      position: absolute; top: 16px; right: 20px; color: #fff; font-size: 32px;
-      background: none; border: none; cursor: pointer; line-height: 1;
-    }
-    .modal img, .modal video { max-width: 100%; max-height: 85vh; border-radius: 8px; }
-
-    @media (min-width: 768px) {
-      body { padding-bottom: 100px; }
-      nav.bottom {
-        left: 50%; transform: translateX(-50%); bottom: 24px; width: auto;
-        height: auto; border-radius: 16px; padding: 6px; gap: 4px;
-        box-shadow: 0 8px 32px rgba(0,0,0,.12);
-      }
-      nav.bottom button {
-        flex-direction: row; gap: 8px; padding: 10px 16px; border-radius: 12px;
-        font-size: 13px; width: auto;
-      }
-      nav.bottom button.active { background: var(--primary); color: #fff; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>DevFolio Ads</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--p:#13294B;--a:#2E6F95;--bg:#F5F7FA;--c:#fff;--t:#1C1C1E;--g:#6B7280;--s:#1E9E63}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100dvh;padding-bottom:calc(76px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+img{display:block;max-width:100%}
+.hdr{position:sticky;top:0;z-index:50;height:56px;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;box-shadow:0 2px 12px rgba(19,41,75,.25)}
+.hdr h1{font-size:17px;font-weight:600}
+.lang-w{position:relative}
+.lang-b{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff}
+.lang-b:hover{background:rgba(255,255,255,.12)}
+.lang-b svg{width:22px;height:22px}
+.lang-m{position:absolute;right:0;top:48px;width:180px;max-height:280px;overflow-y:auto;background:#fff;color:var(--t);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.14);padding:6px 0;display:none;z-index:60}
+.lang-m.open{display:block}
+.lang-m button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:14px}
+.lang-m button:hover,.lang-m button.on{background:var(--bg);color:var(--p);font-weight:600}
+.main{max-width:560px;margin:0 auto;padding:20px 16px 28px}
+.sc{display:none;animation:fu .28s ease}
+.sc.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hero{background:linear-gradient(145deg,#13294B,#1a3a5c 45%,#2E6F95);border-radius:20px;padding:24px;color:#fff;box-shadow:0 8px 28px rgba(19,41,75,.22)}
+.hero-t{display:flex;align-items:center;gap:14px}
+.av{width:68px;height:68px;border-radius:18px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);position:relative}
+.av img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
+.av .fb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;z-index:0}
+.hn{font-weight:700;font-size:15px}
+.hf{color:rgba(255,255,255,.72);font-size:13px;margin-top:3px}
+.hero h2{font-size:19px;font-weight:700;line-height:1.35;margin-top:18px}
+.hero .bio{color:rgba(255,255,255,.78);font-size:14px;line-height:1.5;margin-top:10px}
+.badge{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:7px 14px;background:rgba(255,255,255,.14);border-radius:999px;font-size:12px;font-weight:600}
+.badge .d{width:8px;height:8px;border-radius:50%;background:var(--s);box-shadow:0 0 0 3px rgba(30,158,99,.25)}
+.info{margin-top:18px;display:flex;flex-direction:column;gap:11px}
+.ir{display:flex;align-items:center;gap:10px;font-size:14px}
+.ir svg{width:18px;height:18px;color:var(--a);flex-shrink:0}
+.ir .l{color:var(--g);font-weight:600}
+.st{font-size:17px;font-weight:700;margin:24px 0 14px}
+.doms{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:420px){.doms{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:520px){.doms{grid-template-columns:repeat(5,1fr)}}
+.dom{background:var(--c);border-radius:18px;padding:16px 8px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.06);display:flex;flex-direction:column;align-items:center;min-height:118px;justify-content:center;transition:transform .15s,box-shadow .15s}
+.dom:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.di{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--a));display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:#fff}
+.di svg{width:22px;height:22px}
+.dom span{font-size:11.5px;font-weight:600;line-height:1.3}
+.card{background:var(--c);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid rgba(0,0,0,.04);box-shadow:0 4px 16px rgba(0,0,0,.06);display:flex;gap:14px;align-items:flex-start;transition:transform .15s}
+.card:hover{transform:translateY(-1px)}
+.ci{width:48px;height:48px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ci svg{width:22px;height:22px}
+.ci.edu{background:rgba(46,111,149,.12);color:var(--a);border-radius:12px}
+.card h3{font-size:15.5px;font-weight:700}
+.card p{color:var(--g);font-size:13.5px;line-height:1.45;margin-top:5px}
+.tabs{display:flex;background:#fff;border-radius:12px;padding:4px;margin-bottom:16px;box-shadow:0 4px 16px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.04)}
+.tabs button{flex:1;padding:11px 8px;border-radius:10px;font-size:13.5px;font-weight:500;color:var(--g);transition:all .18s}
+.tabs button.on{background:var(--p);color:#fff;font-weight:600}
+.sk .top{display:flex;justify-content:space-between;margin-bottom:8px}
+.sk .top span{font-weight:600;font-size:14.5px}
+.bar{height:6px;background:rgba(19,41,75,.08);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--a);border-radius:4px;width:0;transition:width .7s cubic-bezier(.22,1,.36,1)}
+.lock{display:flex;align-items:center;gap:8px;background:rgba(19,41,75,.06);color:var(--p);font-size:12px;padding:10px 14px;border-radius:12px;margin-bottom:14px}
+.lock svg{width:16px;height:16px;flex-shrink:0}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(min-width:480px){.mg{grid-template-columns:1fr 1fr 1fr}}
+.mi{aspect-ratio:.9;border-radius:14px;overflow:hidden;background:rgba(19,41,75,.08);position:relative;cursor:pointer;padding:0;border:none;transition:transform .15s}
+.mi:hover{transform:scale(1.02)}
+.mi img{width:100%;height:100%;object-fit:cover}
+.mi .pw{position:absolute;inset:0;background:var(--p);display:flex;align-items:center;justify-content:center;color:#fff}
+.mi .pw svg{width:40px;height:40px}
+.cb{display:flex;align-items:center;gap:14px;width:100%;background:var(--c);border:1px solid rgba(0,0,0,.04);border-radius:14px;padding:15px 16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.06);text-align:left;transition:transform .15s,box-shadow .15s}
+.cb:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.cb .ico{width:42px;height:42px;border-radius:11px;background:rgba(19,41,75,.08);color:var(--p);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cb .ico svg{width:20px;height:20px}
+.cb .lb{font-weight:600;font-size:15px;flex:1}
+.cb .ch{color:var(--g)}
+.cb .ch svg{width:16px;height:16px}
+.stt{text-align:center;padding:48px 16px;color:var(--g);font-size:14px}
+.sp{width:32px;height:32px;margin:0 auto 12px;border:3px solid rgba(19,41,75,.12);border-top-color:var(--p);border-radius:50%;animation:spin .65s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bn{position:fixed;bottom:0;left:0;right:0;z-index:50;height:calc(72px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#fff;display:flex;box-shadow:0 -2px 16px rgba(0,0,0,.06);border-top:1px solid rgba(0,0,0,.05)}
+.bn button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--g);font-size:10.5px;font-weight:500;padding:8px 2px;transition:color .15s}
+.bn button.on{color:var(--p);font-weight:600}
+.bn button svg{width:24px;height:24px}
+.bn button .nl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2}
+@media(min-width:768px){body{padding-bottom:100px}.bn{left:50%;right:auto;bottom:24px;transform:translateX(-50%);width:auto;height:auto;padding:6px;gap:4px;border-radius:18px;box-shadow:0 8px 32px rgba(0,0,0,.12)}.bn button{flex-direction:row;gap:8px;padding:10px 18px;border-radius:12px;font-size:13px;width:auto}.bn button.on{background:var(--p);color:#fff}.bn button svg{width:20px;height:20px}}
+.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.mc{position:absolute;top:16px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
+.mb{max-width:900px;width:100%;max-height:85vh}
+.mb img,.mb video{width:100%;max-height:85vh;object-fit:contain;border-radius:10px}
+</style>
 </head>
 <body>
-  <header>
-    <h1 id="pageTitle">Accueil</h1>
-    <div style="position:relative">
-      <button class="lang-btn" id="langBtn" title="Langue">🌐</button>
-      <div class="lang-menu" id="langMenu"></div>
-    </div>
-  </header>
-
-  <main>
-    <!-- HOME -->
-    <div class="screen active" id="screen0">
-      <div class="hero">
-        <div class="hero-top">
-          <div class="avatar">
-            <img id="profileImg" src="https://raw.githubusercontent.com/hokonvonme-gif/cv-perso/main/IMG_20260708_222543.jpg" alt="Profil" onerror="this.style.display='none'" />
-            <div class="fallback">TK</div>
-          </div>
-          <div>
-            <div class="hero-name"><span data-i18n="label_lastname">Nom</span> : KANGNI-SOUKPE</div>
-            <div class="hero-first"><span data-i18n="label_firstnames">Prénoms</span> : Têko Kossi Félix</div>
-          </div>
-        </div>
-        <h2 data-i18n="role_title">Ingénieur systèmes intelligents — Développeur embarqué & IA</h2>
-        <p class="bio" data-i18n="bio">Je conçois des solutions complètes alliant systèmes embarqués, applications mobiles et intelligence artificielle, de l'électronique jusqu'au cloud.</p>
-        <div class="badge" id="availBadge">
-          <span class="dot"></span>
-          <span data-i18n="availability_status">Disponible pour projets freelance</span>
-        </div>
-      </div>
-      <div class="info-row">
-        <span>📍</span>
-        <span class="label" data-i18n="location_label">Localisation</span> :
-        <span>Accra, Ghana</span>
-      </div>
-      <div class="info-row">
-        <span>💬</span>
-        <span class="label" data-i18n="languages_label">Langues parlées</span> :
-        <span data-i18n="spoken_languages_value">Français, Anglais</span>
-      </div>
-      <h3 class="section-title" data-i18n="domains_title">Domaines d'expertise</h3>
-      <div class="domains" id="domains"></div>
-    </div>
-
-    <!-- PROJECTS -->
-    <div class="screen" id="screen1">
-      <div id="projectsList"></div>
-    </div>
-
-    <!-- PROFILE -->
-    <div class="screen" id="screen2">
-      <div class="tabs">
-        <button class="active" data-sub="edu" data-i18n="education_title">Formation</button>
-        <button data-sub="skills" data-i18n="skills_title">Mes compétences</button>
-      </div>
-      <div id="eduPanel">
-        <p style="color:var(--grey);font-size:13px;margin-bottom:14px" data-i18n="education_subtitle">Diplômes, écoles/universités, dates</p>
-        <div id="eduList"></div>
-      </div>
-      <div id="skillsPanel" style="display:none">
-        <div id="skillsList"></div>
-      </div>
-    </div>
-
-    <!-- DEMOS -->
-    <div class="screen" id="screen3">
-      <div class="lock-banner">🔒 <span data-i18n="demos_view_only">Contenu en lecture seule — téléchargement désactivé.</span></div>
-      <div class="tabs">
-        <button class="active" data-demo="photos" data-i18n="demos_tab_photos">Photos</button>
-        <button data-demo="videos" data-i18n="demos_tab_videos">Vidéos</button>
-      </div>
-      <div id="mediaGrid" class="grid-media"></div>
-    </div>
-
-    <!-- CONTACT -->
-    <div class="screen" id="screen4">
-      <h2 style="font-size:20px;font-weight:700;margin-bottom:8px" data-i18n="contact_title">Restons en contact</h2>
-      <p style="color:var(--grey);margin-bottom:24px" data-i18n="contact_subtitle">Un projet en tête ? Contactez-moi via l'un de ces canaux.</p>
-      <button class="contact-btn" onclick="openEmail()"><div class="ico">✉️</div><span data-i18n="contact_button_email">Envoyer un email</span><span class="arrow">›</span></button>
-      <button class="contact-btn" onclick="openDialer()"><div class="ico">📞</div><span data-i18n="contact_button_call">Appeler</span><span class="arrow">›</span></button>
-      <button class="contact-btn" onclick="openWhatsApp()"><div class="ico">💬</div><span data-i18n="contact_button_whatsapp">WhatsApp</span><span class="arrow">›</span></button>
-      <button class="contact-btn" onclick="window.open(CFG.githubUrl,'_blank')"><div class="ico">🐙</div><span data-i18n="contact_button_github">GitHub</span><span class="arrow">›</span></button>
-      <button class="contact-btn" onclick="window.open(CFG.linkedinUrl,'_blank')"><div class="ico">💼</div><span data-i18n="contact_button_linkedin">LinkedIn</span><span class="arrow">›</span></button>
-    </div>
-  </main>
-
-  <nav class="bottom" id="bottomNav">
-    <button class="active" data-tab="0"><span class="ico">🏠</span><span data-nav="nav_home">Accueil</span></button>
-    <button data-tab="1"><span class="ico">💼</span><span data-nav="nav_projects">Projets</span></button>
-    <button data-tab="2"><span class="ico">🔧</span><span data-nav="nav_skills">Profil</span></button>
-    <button data-tab="3"><span class="ico">🎬</span><span data-nav="nav_demos">Démos</span></button>
-    <button data-tab="4"><span class="ico">✉️</span><span data-nav="nav_contact">Contact</span></button>
-  </nav>
-
-  <div class="modal" id="modal">
-    <button class="close" onclick="closeModal()">×</button>
-    <div id="modalContent"></div>
+<header class="hdr">
+  <h1 id="pt">Accueil</h1>
+  <div class="lang-w">
+    <button type="button" class="lang-b" id="langBtn" aria-label="Langue">
+      <svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm87.63,96H175.8c-1.59-28.23-10.31-54.41-23.21-73A88.2,88.2,0,0,1,215.63,120ZM128,215.63c-16.45-15.4-28.13-40.8-30.4-71.63h60.8C156.13,174.83,144.45,200.23,128,215.63ZM97.6,120c2.27-30.83,14-56.23,30.4-71.63,16.45,15.4,28.13,40.8,30.4,71.63Zm6.81-73C91.51,65.59,82.79,91.77,81.2,120H40.37A88.2,88.2,0,0,1,104.41,47ZM40.37,136H81.2c1.59,28.23,10.31,54.41,23.21,73A88.2,88.2,0,0,1,40.37,136Zm111.22,73c12.9-18.59,21.62-44.77,23.21-73h40.83A88.2,88.2,0,0,1,151.59,209Z"/></svg>
+    </button>
+    <div class="lang-m" id="langMenu"></div>
   </div>
-
-  <script>
-    /* ========== CONFIG (mêmes valeurs que l'app Flutter) ========== */
-    const CFG = {
-      supabaseUrl: 'https://mcxtihnpyvxwdgkwzvav.supabase.co',
-      supabaseAnonKey: 'sb_publishable_AtW6KMEUNH0e6lLYzFwImA_n9cSwqDr',
-      mediaBucket: 'demos',
-      contactEmail: 'tekokossifelixkangnisoukpe5@gmail.com',
-      contactPhone: '+223244390900',
-      whatsappNumber: '244390900',
-      githubUrl: 'https://github.com/vondchatmaon-ui',
-      linkedinUrl: 'https://www.linkedin.com/in/ton-profil',
-      location: 'Accra, Ghana',
-      isAvailableForFreelance: true,
-    };
-
-    const supabase = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
-
-    /* ========== TRADUCTIONS ========== */
-    const LANGS = {
-      fr: 'Français', en: 'English', es: 'Español', pt: 'Português', de: 'Deutsch',
-      it: 'Italiano', ar: 'العربية', zh: '中文', ru: 'Русский', sw: 'Kiswahili',
-      tr: 'Türkçe', hi: 'हिन्दी', ha: 'Hausa', yo: 'Yorùbá', ee: 'Eʋegbe',
-    };
-
-    const I18N = {
-      fr: {
-        nav_home:'Accueil', nav_projects:'Projets', nav_skills:'Profil', nav_demos:'Démos', nav_contact:'Contact',
-        role_title:'Ingénieur systèmes intelligents — Développeur embarqué & IA',
-        bio:"Je conçois des solutions complètes alliant systèmes embarqués, applications mobiles et intelligence artificielle, de l'électronique jusqu'au cloud.",
-        availability_status:'Disponible pour projets freelance', location_label:'Localisation', languages_label:'Langues parlées',
-        domains_title:"Domaines d'expertise", skills_title:'Mes compétences', projects_empty:'Aucun projet à afficher pour le moment.',
-        demos_tab_photos:'Photos', demos_tab_videos:'Vidéos', demos_view_only:'Contenu en lecture seule — téléchargement désactivé.', demos_empty:'Aucune démonstration disponible pour le moment.',
-        contact_title:'Restons en contact', contact_subtitle:"Un projet en tête ? Contactez-moi via l'un de ces canaux.",
-        contact_button_email:'Envoyer un email', contact_button_call:'Appeler', contact_button_whatsapp:'WhatsApp', contact_button_github:'GitHub', contact_button_linkedin:'LinkedIn',
-        loading:'Chargement...', domain_systems:'Systèmes intelligents', domain_electronics:'Électronique embarquée', domain_automation:'Automatisation', domain_ai:'Intelligence artificielle', domain_connected:'Technologies connectées',
-        label_lastname:'Nom', label_firstnames:'Prénoms', education_title:'Formation', education_subtitle:'Diplômes, écoles/universités, dates',
-        spoken_languages_value:'Français, Anglais', series_f2_electronics:'F2 - Électronique', edu_program_ee:'1ère année Génie Électrique',
-        edu_date_cepd:'Juillet 2017', edu_date_bepc:'Juillet 2021', edu_date_bac1:'Mai 2023', edu_date_bac2:'Juin 2024', edu_date_ongoing:'En cours',
-        skill_embedded:'Systèmes embarqués', skill_electronics_automation:'Électronique & automatisation', skill_ai_vision:'IA & vision par ordinateur', skill_hw_sw_integration:'Intégration matériel / logiciel',
-        skill_software_dev:'Développement logiciel', skill_mobile_apps:'Applications mobiles', skill_web_apps:'Applications web', skill_iot_connected:'IoT & systèmes connectés',
-      },
-      en: {
-        nav_home:'Home', nav_projects:'Projects', nav_skills:'Profile', nav_demos:'Demos', nav_contact:'Contact',
-        role_title:'Intelligent Systems Engineer — Embedded & AI Developer',
-        bio:'I build end-to-end solutions spanning embedded systems, mobile apps, and artificial intelligence, from the electronics up to the cloud.',
-        availability_status:'Available for freelance projects', location_label:'Location', languages_label:'Languages spoken',
-        domains_title:'Areas of expertise', skills_title:'My Skills', projects_empty:'No projects to show yet.',
-        demos_tab_photos:'Photos', demos_tab_videos:'Videos', demos_view_only:'View-only content — downloading is disabled.', demos_empty:'No demos available yet.',
-        contact_title:"Let's connect", contact_subtitle:'Have a project in mind? Reach out through any of these channels.',
-        contact_button_email:'Send an email', contact_button_call:'Call', contact_button_whatsapp:'WhatsApp', contact_button_github:'GitHub', contact_button_linkedin:'LinkedIn',
-        loading:'Loading...', domain_systems:'Intelligent systems', domain_electronics:'Embedded electronics', domain_automation:'Automation', domain_ai:'Artificial intelligence', domain_connected:'Connected technologies',
-        label_lastname:'Last name', label_firstnames:'First names', education_title:'Education', education_subtitle:'Diplomas, schools/universities, dates',
-        spoken_languages_value:'French, English', series_f2_electronics:'F2 - Electronics', edu_program_ee:'1st year Electrical Engineering',
-        edu_date_cepd:'July 2017', edu_date_bepc:'July 2021', edu_date_bac1:'May 2023', edu_date_bac2:'June 2024', edu_date_ongoing:'Ongoing',
-        skill_embedded:'Embedded systems', skill_electronics_automation:'Electronics & automation', skill_ai_vision:'AI & computer vision', skill_hw_sw_integration:'Hardware / software integration',
-        skill_software_dev:'Software development', skill_mobile_apps:'Mobile applications', skill_web_apps:'Web applications', skill_iot_connected:'IoT & connected systems',
-      },
-    };
-    // Autres langues → anglais
-    Object.keys(LANGS).forEach(l => { if (!I18N[l]) I18N[l] = I18N.en; });
-
-    let locale = 'fr';
-    function t(key) { return (I18N[locale] && I18N[locale][key]) || I18N.en[key] || key; }
-
-    function applyI18n() {
-      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
-      document.querySelectorAll('[data-nav]').forEach(el => { el.textContent = t(el.getAttribute('data-nav')); });
-      const titles = [t('nav_home'), t('nav_projects'), t('nav_skills'), t('nav_demos'), t('nav_contact')];
-      document.getElementById('pageTitle').textContent = titles[currentTab];
-      renderDomains();
-      if (document.getElementById('eduList').children.length) renderEducation();
-      if (usingFallbackSkills) renderFallbackSkills();
-    }
-
-    /* ========== NAV ========== */
-    let currentTab = 0;
-    document.getElementById('bottomNav').addEventListener('click', e => {
-      const btn = e.target.closest('button[data-tab]');
-      if (!btn) return;
-      currentTab = +btn.dataset.tab;
-      document.querySelectorAll('#bottomNav button').forEach(b => b.classList.toggle('active', +b.dataset.tab === currentTab));
-      document.querySelectorAll('.screen').forEach((s, i) => s.classList.toggle('active', i === currentTab));
-      document.getElementById('pageTitle').textContent = [t('nav_home'), t('nav_projects'), t('nav_skills'), t('nav_demos'), t('nav_contact')][currentTab];
-    });
-
-    /* ========== LANG ========== */
-    const langMenu = document.getElementById('langMenu');
-    Object.entries(LANGS).forEach(([code, name]) => {
-      const b = document.createElement('button');
-      b.textContent = name;
-      b.onclick = () => { locale = code; langMenu.classList.remove('open'); applyI18n(); };
-      langMenu.appendChild(b);
-    });
-    document.getElementById('langBtn').onclick = () => langMenu.classList.toggle('open');
-    document.addEventListener('click', e => { if (!e.target.closest('#langBtn') && !e.target.closest('#langMenu')) langMenu.classList.remove('open'); });
-
-    /* ========== HOME DOMAINS ========== */
-    const DOMAINS = [
-      { icon: '⚡', key: 'domain_systems' },
-      { icon: '🔌', key: 'domain_electronics' },
-      { icon: '⚙️', key: 'domain_automation' },
-      { icon: '🧠', key: 'domain_ai' },
-      { icon: '🌐', key: 'domain_connected' },
-    ];
-    function renderDomains() {
-      document.getElementById('domains').innerHTML = DOMAINS.map(d =>
-        `<div class="domain-card"><div class="domain-icon">${d.icon}</div><span>${t(d.key)}</span></div>`
-      ).join('');
-    }
-
-    /* ========== PROJECTS ========== */
-    const FALLBACK_PROJECTS = [
-      { title: 'YAKA', description: "Assistant IA local (français/anglais), stockage SQLite, analyse d'images.", icon: '🤖' },
-      { title: 'Station météo ESP32', description: 'Tableau de bord web temps réel avec imagerie satellite FengYun.', icon: '☁️' },
-      { title: 'LBLE', description: 'Projet embarqué basé sur communication Bluetooth Low Energy.', icon: '📡' },
-      { title: 'Computer Vision', description: 'Détection de pose animale combinant YOLO et DeepLabCut.', icon: '📷' },
-      { title: 'Maison connectée', description: "Système domotique complet : contrôle des lumières, capteurs et automatisations.", icon: '🏠' },
-    ];
-    async function loadProjects() {
-      const box = document.getElementById('projectsList');
-      box.innerHTML = `<div class="loading"><div class="spinner"></div>${t('loading')}</div>`;
-      let items = [];
-      try {
-        const { data } = await supabase.from('projects').select('*').order('order_index');
-        if (data && data.length) items = data.map(p => ({ title: p.title, description: p.description, icon: '💼' }));
-      } catch (_) {}
-      if (!items.length) items = FALLBACK_PROJECTS;
-      box.innerHTML = items.map(p =>
-        `<div class="card"><div class="card-icon">${p.icon || '💼'}</div><div><h3>${p.title}</h3><p>${p.description}</p></div></div>`
-      ).join('');
-    }
-
-    /* ========== EDUCATION ========== */
-    const EDUCATION = [
-      { diploma: 'CEPD', dateKey: 'edu_date_cepd', school: 'EPP Akodessewa Kpota' },
-      { diploma: 'BEPC', dateKey: 'edu_date_bepc', school: 'Lycée de Bè-Kpota' },
-      { diploma: 'BAC1', dateKey: 'edu_date_bac1', school: 'CS ITEM', series: 'series_f2_electronics' },
-      { diploma: 'BAC2', dateKey: 'edu_date_bac2', school: 'CS ITEM', series: 'series_f2_electronics' },
-      { diploma: '', dateKey: 'edu_date_ongoing', school: 'Accra Institute of Technology', programKey: 'edu_program_ee' },
-    ];
-    function renderEducation() {
-      document.getElementById('eduList').innerHTML = EDUCATION.map(e => {
-        const title = e.programKey ? t(e.programKey) : (e.series ? `${e.diploma} (${t(e.series)})` : e.diploma);
-        return `<div class="card"><div class="edu-icon">🎓</div><div><h3 style="font-size:15px">${title}</h3><p style="margin-top:4px;font-size:13px">${e.school} — ${t(e.dateKey)}</p></div></div>`;
-      }).join('');
-    }
-
-    /* ========== SKILLS ========== */
-    let usingFallbackSkills = true;
-    const SKILL_KEYS = ['skill_embedded','skill_electronics_automation','skill_ai_vision','skill_hw_sw_integration','skill_software_dev','skill_mobile_apps','skill_web_apps','skill_iot_connected'];
-    function renderFallbackSkills() {
-      document.getElementById('skillsList').innerHTML = SKILL_KEYS.map(k =>
-        `<div class="card" style="flex-direction:column;align-items:stretch"><div style="font-weight:600;font-size:15px">${t(k)}</div><div class="skill-bar"><span style="width:80%"></span></div></div>`
-      ).join('');
-    }
-    async function loadSkills() {
-      try {
-        const { data } = await supabase.from('skills').select('*').order('order_index');
-        if (data && data.length) {
-          usingFallbackSkills = false;
-          document.getElementById('skillsList').innerHTML = data.map(s => {
-            const pct = Math.min(5, Math.max(0, s.level || 3)) / 5 * 100;
-            return `<div class="card" style="flex-direction:column;align-items:stretch"><div style="font-weight:600;font-size:15px">${s.name}</div><div class="skill-bar"><span style="width:${pct}%"></span></div></div>`;
-          }).join('');
-          return;
-        }
-      } catch (_) {}
-      renderFallbackSkills();
-    }
-
-    /* Profile sub-tabs */
-    document.querySelectorAll('#screen2 .tabs button').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('#screen2 .tabs button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const isEdu = btn.dataset.sub === 'edu';
-        document.getElementById('eduPanel').style.display = isEdu ? 'block' : 'none';
-        document.getElementById('skillsPanel').style.display = isEdu ? 'none' : 'block';
-      };
-    });
-
-    /* ========== DEMOS ========== */
-    let allMedia = [];
-    let demoMode = 'photos';
-    async function loadMedia() {
-      const grid = document.getElementById('mediaGrid');
-      grid.innerHTML = `<div class="loading" style="grid-column:1/-1"><div class="spinner"></div>${t('loading')}</div>`;
-      try {
-        const { data } = await supabase.from('media').select('*').order('order_index');
-        allMedia = data || [];
-      } catch (_) { allMedia = []; }
-      renderMedia();
-    }
-    function publicUrl(path) {
-      return supabase.storage.from(CFG.mediaBucket).getPublicUrl(path).data.publicUrl;
-    }
-    function renderMedia() {
-      const items = allMedia.filter(m => m.type === (demoMode === 'photos' ? 'image' : 'video'));
-      const grid = document.getElementById('mediaGrid');
-      if (!items.length) {
-        grid.innerHTML = `<p class="empty" style="grid-column:1/-1">${t('demos_empty')}</p>`;
-        return;
-      }
-      grid.innerHTML = items.map(m => {
-        const url = publicUrl(m.storage_path);
-        if (m.type === 'image') {
-          return `<button class="media-item" onclick="openModal('image','${url}')"><img src="${url}" alt="" loading="lazy" /></button>`;
-        }
-        return `<button class="media-item" onclick="openModal('video','${url}')"><div class="play">▶</div></button>`;
-      }).join('');
-    }
-    document.querySelectorAll('#screen3 .tabs button').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('#screen3 .tabs button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        demoMode = btn.dataset.demo;
-        renderMedia();
-      };
-    });
-
-    function openModal(type, url) {
-      const c = document.getElementById('modalContent');
-      c.innerHTML = type === 'image'
-        ? `<img src="${url}" alt="" />`
-        : `<video src="${url}" controls autoplay style="max-width:100%;max-height:85vh;border-radius:8px"></video>`;
-      document.getElementById('modal').classList.add('open');
-    }
-    function closeModal() { document.getElementById('modal').classList.remove('open'); document.getElementById('modalContent').innerHTML = ''; }
-    document.getElementById('modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
-
-    /* ========== CONTACT ========== */
-    function openEmail() { window.location.href = `mailto:${CFG.contactEmail}?subject=${encodeURIComponent('Contact depuis le site web')}`; }
-    function openDialer() { window.location.href = `tel:${CFG.contactPhone}`; }
-    function openWhatsApp() { window.open(`https://wa.me/${CFG.whatsappNumber}?text=${encodeURIComponent('Bonjour, je vous contacte depuis votre site web.')}`, '_blank'); }
-
-    /* ========== INIT ========== */
-    renderDomains();
-    renderEducation();
-    loadProjects();
-    loadSkills();
-    loadMedia();
-    applyI18n();
-  </script>
+</header>
+<main class="main">
+<section class="sc on" id="s0" data-k="nav_home">
+  <div class="hero">
+    <div class="hero-t">
+      <div class="av">
+        <div class="fb">TK</div>
+        <img src="https://raw.githubusercontent.com/hokonvonme-gif/cv-perso/main/IMG_20260708_222543.jpg" alt="Profil" onerror="this.style.display='none'"/>
+      </div>
+      <div>
+        <div class="hn"><span data-i="label_lastname">Nom</span> : KANGNI-SOUKPE</div>
+        <div class="hf"><span data-i="label_firstnames">Prénoms</span> : Têko Kossi Félix</div>
+      </div>
+    </div>
+    <h2 data-i="role_title">Ingénieur systèmes intelligents — Développeur embarqué & IA</h2>
+    <p class="bio" data-i="bio">Je conçois des solutions complètes alliant systèmes embarqués, applications mobiles et intelligence artificielle, de l'électronique jusqu'au cloud.</p>
+    <div class="badge"><span class="d"></span><span data-i="availability_status">Disponible pour projets freelance</span></div>
+  </div>
+  <div class="info">
+    <div class="ir">
+      <svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,16a88.1,88.1,0,0,0-88,88c0,75.3,80,132.17,83.41,134.55a8,8,0,0,0,9.18,0C136,236.17,216,179.3,216,104A88.1,88.1,0,0,0,128,16Zm0,56a32,32,0,1,1-32,32A32,32,0,0,1,128,72Z"/></svg>
+      <span class="l" data-i="location_label">Localisation</span><span> : Accra, Ghana</span>
+    </div>
+    <div class="ir">
+      <svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm-8,176V168a8,8,0,0,1,16,0v32a8,8,0,0,1-16,0Zm8-56a12,12,0,1,1,12-12A12,12,0,0,1,128,144Z"/></svg>
+      <span class="l" data-i="languages_label">Langues parlées</span><span> : <span data-i="spoken_languages_value">Français, Anglais</span></span>
+    </div>
+  </div>
+  <h3 class="st" data-i="domains_title">Domaines d'expertise</h3>
+  <div class="doms" id="domains"></div>
+</section>
+<section class="sc" id="s1" data-k="nav_projects"><div id="proj"></div></section>
+<section class="sc" id="s2" data-k="nav_skills">
+  <div class="tabs" id="pTabs">
+    <button type="button" class="on" data-p="edu" data-i="education_title">Formation</button>
+    <button type="button" data-p="sk" data-i="skills_title">Mes compétences</button>
+  </div>
+  <div id="pEdu"><p style="color:var(--g);font-size:13px;margin-bottom:14px" data-i="education_subtitle">Diplômes, écoles/universités, dates</p><div id="edu"></div></div>
+  <div id="pSk" style="display:none"><div id="skills"></div></div>
+</section>
+<section class="sc" id="s3" data-k="nav_demos">
+  <div class="lock"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Zm112,152H48V96H208V208Z"/></svg><span data-i="demos_view_only">Contenu en lecture seule — téléchargement désactivé.</span></div>
+  <div class="tabs" id="dTabs">
+    <button type="button" class="on" data-d="image" data-i="demos_tab_photos">Photos</button>
+    <button type="button" data-d="video" data-i="demos_tab_videos">Vidéos</button>
+  </div>
+  <div class="mg" id="media"></div>
+</section>
+<section class="sc" id="s4" data-k="nav_contact">
+  <h2 style="font-size:20px;font-weight:700;margin-bottom:8px" data-i="contact_title">Restons en contact</h2>
+  <p style="color:var(--g);margin-bottom:22px;font-size:14.5px;line-height:1.45" data-i="contact_subtitle">Un projet en tête ? Contactez-moi via l'un de ces canaux.</p>
+  <button type="button" class="cb" id="bEmail"><div class="ico"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-8,144H40V88.69l82.34,81.68a8,8,0,0,0,11.32,0L216,88.69Zm0-131.41-80,79.27L56,60.59V56H216Z"/></svg></div><span class="lb" data-i="contact_button_email">Envoyer un email</span><span class="ch"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></span></button>
+  <button type="button" class="cb" id="bCall"><div class="ico"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M222.37,158.46l-47.11-21.11-.13-.06a16,16,0,0,0-15.17,1.4,8.12,8.12,0,0,0-.75.56L134.87,160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L97.54,33.64a16,16,0,0,0-16.62-9.52A56.26,56.26,0,0,0,32,80c0,79.4,64.6,144,144,144a56.26,56.26,0,0,0,55.88-48.92A16,16,0,0,0,222.37,158.46Z"/></svg></div><span class="lb" data-i="contact_button_call">Appeler</span><span class="ch"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></span></button>
+  <button type="button" class="cb" id="bWa"><div class="ico"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24L79.12,219.82A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.41-12,8,8,0,0,0-6.42-.59l-31.16,10.38,10.38-31.16a8,8,0,0,0-.59-6.42A88,88,0,1,1,128,216Zm44.86-67.14-16-8a8,8,0,0,0-8.1.54l-9.38,6.25a40.4,40.4,0,0,1-16-16l6.25-9.38a8,8,0,0,0,.54-8.1l-8-16A8,8,0,0,0,112,96a40,40,0,0,0-40,40,88.1,88.1,0,0,0,88,88,40,40,0,0,0,40-40A8,8,0,0,0,172.86,148.86Z"/></svg></div><span class="lb" data-i="contact_button_whatsapp">WhatsApp</span><span class="ch"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></span></button>
+  <button type="button" class="cb" id="bGh"><div class="ico"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M208.31,75.68A59.78,59.78,0,0,0,202.93,28,8,8,0,0,0,196,24a59.75,59.75,0,0,0-48,24H108A59.75,59.75,0,0,0,60,24a8,8,0,0,0-6.93,4,59.78,59.78,0,0,0-5.38,47.68A58.14,58.14,0,0,0,28,128c0,29.51,14.85,48.45,29.69,61.13,8.87,7.61,18.36,13,25.27,16.64V232a8,8,0,0,0,16,0V204.47a104.61,104.61,0,0,0,24,2.53,104.46,104.46,0,0,0,24-2.53V232a8,8,0,0,0,16,0V205.77c6.91-3.62,16.4-9,25.27-16.64C213.15,176.45,228,157.51,228,128A58.14,58.14,0,0,0,208.31,75.68ZM171,180.35c-8.16,7-16.89,11.49-22.62,13.92a8,8,0,0,0-4.75.73A88.54,88.54,0,0,1,128,196a88.41,88.41,0,0,1-15.63-1,8,8,0,0,0-4.75-.73c-5.73-2.43-14.46-6.92-22.62-13.92C70.89,168.25,60,151.35,60,128a42,42,0,0,1,14.67-31.46,8,8,0,0,0,2.54-8.66A43.67,43.67,0,0,1,76,72.67,43.93,43.93,0,0,1,100.45,80h55.1A43.93,43.93,0,0,1,180,72.67a43.67,43.67,0,0,1-1.21,15.21,8,8,0,0,0,2.54,8.66A42,42,0,0,1,196,128C196,151.35,185.11,168.25,171,180.35Z"/></svg></div><span class="lb" data-i="contact_button_github">GitHub</span><span class="ch"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></span></button>
+  <button type="button" class="cb" id="bLi"><div class="ico"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24ZM96,176a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0ZM88,96a12,12,0,1,1,12-12A12,12,0,0,1,88,96Zm96,80a8,8,0,0,1-16,0V140c0-10.29-3.52-16-10.35-16-7.52,0-11.14,5.15-11.14,16v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A26.92,26.92,0,0,1,156.92,104C171.18,104,184,113.59,184,136Z"/></svg></div><span class="lb" data-i="contact_button_linkedin">LinkedIn</span><span class="ch"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></span></button>
+</section>
+</main>
+<nav class="bn" id="bn">
+  <button type="button" class="on" data-t="0"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V115.54a16,16,0,0,1,5.17-11.71l80-75.31a16,16,0,0,1,21.66,0l80,75.31A16,16,0,0,1,224,115.55Z"/></svg><span class="nl" data-n="nav_home">Accueil</span></button>
+  <button type="button" data-t="1"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,56H176V48a24,24,0,0,0-24-24H104A24,24,0,0,0,80,48v8H40A16,16,0,0,0,24,72V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V72A16,16,0,0,0,216,56ZM96,48a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM216,200H40V72H216V200Z"/></svg><span class="nl" data-n="nav_projects">Projets</span></button>
+  <button type="button" data-t="2"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM84,108a16,16,0,1,1,16,16A16,16,0,0,1,84,108Zm88,72H84a8,8,0,0,1,0-16h88a8,8,0,0,1,0,16Zm0-40H84a8,8,0,0,1,0-16h88a8,8,0,0,1,0,16Zm0-40H156a16,16,0,1,1,16-16A16,16,0,0,1,172,100Z"/></svg><span class="nl" data-n="nav_skills">Profil</span></button>
+  <button type="button" data-t="3"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M164.44,105.34l-48-32A8,8,0,0,0,104,80v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Z"/></svg><span class="nl" data-n="nav_demos">Démos</span></button>
+  <button type="button" data-t="4"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-8,144H40V88.69l82.34,81.68a8,8,0,0,0,11.32,0L216,88.69Zm0-131.41-80,79.27L56,60.59V56H216Z"/></svg><span class="nl" data-n="nav_contact">Contact</span></button>
+</nav>
+<div class="modal" id="modal"><button type="button" class="mc" id="mClose">×</button><div class="mb" id="mBody"></div></div>
+<script>
+(function(){
+var C={supabaseUrl:'https://mcxtihnpyvxwdgkwzvav.supabase.co',supabaseAnonKey:'sb_publishable_AtW6KMEUNH0e6lLYzFwImA_n9cSwqDr',mediaBucket:'demos',contactEmail:'tekokossifelixkangnisoukpe5@gmail.com',contactPhone:'+223244390900',whatsappNumber:'244390900',githubUrl:'https://github.com/vondchatmaon-ui',linkedinUrl:'https://www.linkedin.com/in/ton-profil'};
+var sb=null;try{sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey)}catch(e){}
+var L={fr:'Français',en:'English',es:'Español',pt:'Português',de:'Deutsch',it:'Italiano',ar:'العربية',zh:'中文',ru:'Русский',sw:'Kiswahili',tr:'Türkçe',hi:'हिन्दी',ha:'Hausa',yo:'Yorùbá',ee:'Eʋegbe'};
+var T={fr:{nav_home:'Accueil',nav_projects:'Projets',nav_skills:'Profil',nav_demos:'Démos',nav_contact:'Contact',role_title:'Ingénieur systèmes intelligents — Développeur embarqué & IA',bio:"Je conçois des solutions complètes alliant systèmes embarqués, applications mobiles et intelligence artificielle, de l'électronique jusqu'au cloud.",availability_status:'Disponible pour projets freelance',location_label:'Localisation',languages_label:'Langues parlées',domains_title:"Domaines d'expertise",skills_title:'Mes compétences',projects_empty:'Aucun projet à afficher pour le moment.',demos_tab_photos:'Photos',demos_tab_videos:'Vidéos',demos_view_only:'Contenu en lecture seule — téléchargement désactivé.',demos_empty:'Aucune démonstration disponible pour le moment.',contact_title:'Restons en contact',contact_subtitle:"Un projet en tête ? Contactez-moi via l'un de ces canaux.",contact_button_email:'Envoyer un email',contact_button_call:'Appeler',contact_button_whatsapp:'WhatsApp',contact_button_github:'GitHub',contact_button_linkedin:'LinkedIn',loading:'Chargement...',domain_systems:'Systèmes intelligents',domain_electronics:'Électronique embarquée',domain_automation:'Automatisation',domain_ai:'Intelligence artificielle',domain_connected:'Technologies connectées',label_lastname:'Nom',label_firstnames:'Prénoms',education_title:'Formation',education_subtitle:'Diplômes, écoles/universités, dates',spoken_languages_value:'Français, Anglais',series_f2_electronics:'F2 - Électronique',edu_program_ee:'1ère année Génie Électrique',edu_date_cepd:'Juillet 2017',edu_date_bepc:'Juillet 2021',edu_date_bac1:'Mai 2023',edu_date_bac2:'Juin 2024',edu_date_ongoing:'En cours',skill_embedded:'Systèmes embarqués',skill_electronics_automation:'Électronique & automatisation',skill_ai_vision:'IA & vision par ordinateur',skill_hw_sw_integration:'Intégration matériel / logiciel',skill_software_dev:'Développement logiciel',skill_mobile_apps:'Applications mobiles',skill_web_apps:'Applications web',skill_iot_connected:'IoT & systèmes connectés'},
+en:{nav_home:'Home',nav_projects:'Projects',nav_skills:'Profile',nav_demos:'Demos',nav_contact:'Contact',role_title:'Intelligent Systems Engineer — Embedded & AI Developer',bio:'I build end-to-end solutions spanning embedded systems, mobile apps, and artificial intelligence, from the electronics up to the cloud.',availability_status:'Available for freelance projects',location_label:'Location',languages_label:'Languages spoken',domains_title:'Areas of expertise',skills_title:'My Skills',projects_empty:'No projects to show yet.',demos_tab_photos:'Photos',demos_tab_videos:'Videos',demos_view_only:'View-only content — downloading is disabled.',demos_empty:'No demos available yet.',contact_title:"Let's connect",contact_subtitle:'Have a project in mind? Reach out through any of these channels.',contact_button_email:'Send an email',contact_button_call:'Call',contact_button_whatsapp:'WhatsApp',contact_button_github:'GitHub',contact_button_linkedin:'LinkedIn',loading:'Loading...',domain_systems:'Intelligent systems',domain_electronics:'Embedded electronics',domain_automation:'Automation',domain_ai:'Artificial intelligence',domain_connected:'Connected technologies',label_lastname:'Last name',label_firstnames:'First names',education_title:'Education',education_subtitle:'Diplomas, schools/universities, dates',spoken_languages_value:'French, English',series_f2_electronics:'F2 - Electronics',edu_program_ee:'1st year Electrical Engineering',edu_date_cepd:'July 2017',edu_date_bepc:'July 2021',edu_date_bac1:'May 2023',edu_date_bac2:'June 2024',edu_date_ongoing:'Ongoing',skill_embedded:'Embedded systems',skill_electronics_automation:'Electronics & automation',skill_ai_vision:'AI & computer vision',skill_hw_sw_integration:'Hardware / software integration',skill_software_dev:'Software development',skill_mobile_apps:'Mobile applications',skill_web_apps:'Web applications',skill_iot_connected:'IoT & connected systems'}};
+Object.keys(L).forEach(function(k){if(!T[k])T[k]=T.en});
+var loc='fr';function t(k){return(T[loc]&&T[loc][k])||T.en[k]||k}
+function ai(){document.querySelectorAll('[data-i]').forEach(function(e){e.textContent=t(e.getAttribute('data-i'))});document.querySelectorAll('[data-n]').forEach(function(e){e.textContent=t(e.getAttribute('data-n'))});var a=document.querySelector('.sc.on');if(a)document.getElementById('pt').textContent=t(a.getAttribute('data-k'));rd();re();if(ufs)rfs()}
+var I={lt:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17Z"/></svg>',pl:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M237.66,18.34a8,8,0,0,0-11.32,0l-52.4,52.41-33.94-33.94a8,8,0,0,0-11.32,0L18.34,147.15a8,8,0,0,0,0,11.32l40,40a8,8,0,0,0,11.32,0l52.4-52.41,33.94,33.94a8,8,0,0,0,11.32,0L237.66,69.66a8,8,0,0,0,0-11.32ZM64,185.37,38.63,160,128,70.63,153.37,96Zm96-96L134.63,64,160,38.63,185.37,64ZM192,73.37,182.63,64,208,38.63,217.37,48ZM38.63,128,64,102.63,89.37,128,64,153.37Z"/></svg>',ge:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-35.6V131.6a8,8,0,0,0-4.87-7.43l-14.34-5.73a64.43,64.43,0,0,0-3.68-8.86l6.1-14.54a8,8,0,0,0-1.17-8.52l-14.14-14.14a8,8,0,0,0-8.52-1.17l-14.54,6.1a64.43,64.43,0,0,0-8.86-3.68L139.83,52.87A8,8,0,0,0,132.4,48H123.6a8,8,0,0,0-7.43,4.87l-5.73,14.34a64.43,64.43,0,0,0-8.86,3.68l-14.54-6.1a8,8,0,0,0-8.52,1.17L64.38,80.1a8,8,0,0,0-1.17,8.52l6.1,14.54a64.43,64.43,0,0,0-3.68,8.86L51.29,124.17A8,8,0,0,0,48,131.6v8.8a8,8,0,0,0,4.87,7.43l14.34,5.73a64.43,64.43,0,0,0,3.68,8.86l-6.1,14.54a8,8,0,0,0,1.17,8.52l14.14,14.14a8,8,0,0,0,8.52,1.17l14.54-6.1a64.43,64.43,0,0,0,8.86,3.68l5.73,14.34A8,8,0,0,0,123.6,208h8.8a8,8,0,0,0,7.43-4.87l5.73-14.34a64.43,64.43,0,0,0,8.86-3.68l14.54,6.1a8,8,0,0,0,8.52-1.17l14.14-14.14a8,8,0,0,0,1.17-8.52l-6.1-14.54a64.43,64.43,0,0,0,3.68-8.86l14.34-5.73A8,8,0,0,0,216,140.4Z"/></svg>',br:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39A56,56,0,0,0,8,124c0,29.19,22.5,48.35,40,56.44V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-3.16C229.5,172.35,248,153.19,248,124ZM88,208a32,32,0,0,1-32-32V170a56.09,56.09,0,0,0,32,0Zm40-32a32.06,32.06,0,0,1-16-5.32V85.32A32,32,0,0,1,128,80a32,32,0,0,1,16,5.32v85.36A32.06,32.06,0,0,1,128,176Zm72,0a32,32,0,0,1-32,0v-6a56.09,56.09,0,0,0,32,0Z"/></svg>',gl:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm88,104a87.61,87.61,0,0,1-3.33,24H163.18a157.89,157.89,0,0,0,0-48h49.49A87.61,87.61,0,0,1,216,128ZM102.82,168H153.18a135.28,135.28,0,0,1-25.18,45A135.28,135.28,0,0,1,102.82,168Zm0-80a135.28,135.28,0,0,1,25.18-45A135.28,135.28,0,0,1,153.18,88Zm-9.64,16h49.64a157.89,157.89,0,0,1,0,48H93.18a157.89,157.89,0,0,1,0-48ZM40,128a87.61,87.61,0,0,1,3.33-24H92.82a157.89,157.89,0,0,0,0,48H43.33A87.61,87.61,0,0,1,40,128Z"/></svg>',bf:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M216,56H176V48a24,24,0,0,0-24-24H104A24,24,0,0,0,80,48v8H40A16,16,0,0,0,24,72V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V72A16,16,0,0,0,216,56ZM96,48a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM216,200H40V72H216V200Z"/></svg>',ro:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M200,48H136V16a8,8,0,0,0-16,0V48H56A32,32,0,0,0,24,80V192a32,32,0,0,0,32,32H200a32,32,0,0,0,32-32V80A32,32,0,0,0,200,48ZM92,160a12,12,0,1,1,12-12A12,12,0,0,1,92,160Zm72,0a12,12,0,1,1,12-12A12,12,0,0,1,164,160Z"/></svg>',ca:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.72,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56ZM128,168a36,36,0,1,1,36-36A36,36,0,0,1,128,168Z"/></svg>',cl:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M160,40A88.09,88.09,0,0,0,81.29,88.67,64,64,0,1,0,72,216h88a88,88,0,0,0,0-176Z"/></svg>',ho:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V115.54a16,16,0,0,1,5.17-11.71l80-75.31a16,16,0,0,1,21.66,0l80,75.31A16,16,0,0,1,224,115.55Z"/></svg>',ci:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M120,48V16a8,8,0,0,0-16,0V48a8,8,0,0,0,16,0Zm80,8a8,8,0,0,0-8,8v24H136V64a8,8,0,0,0-16,0v24H80V64a8,8,0,0,0-16,0v24H40a8,8,0,0,0,0,16H64v40H40a8,8,0,0,0,0,16H64v24a8,8,0,0,0,16,0V160h40v24a8,8,0,0,0,16,0V160h40v24a8,8,0,0,0,16,0V160h24a8,8,0,0,0,0-16H192V120h24a8,8,0,0,0,0-16H192V80A8,8,0,0,0,200,56ZM176,144H80V112h96Z"/></svg>',cd:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M69.12,94.15,28.5,128l40.62,33.85a8,8,0,1,1-10.24,12.29l-48-40a8,8,0,0,1,0-12.29l48-40a8,8,0,0,1,10.24,12.3Zm176,27.7-48-40a8,8,0,1,0-10.24,12.3L227.5,128l-40.62,33.85a8,8,0,1,0,10.24,12.29l48-40a8,8,0,0,0,0-12.29ZM162.73,32.48a8,8,0,0,0-10.25,4.79l-64,176a8,8,0,0,0,4.79,10.26A8.14,8.14,0,0,0,96,224a8,8,0,0,0,7.52-5.27l64-176A8,8,0,0,0,162.73,32.48Z"/></svg>',gr:'<svg viewBox="0 0 256 256" fill="currentColor"><path d="M251.76,88.94l-120-64a8,8,0,0,0-7.52,0l-120,64a8,8,0,0,0,0,14.12L32,117.87v48.42a15.91,15.91,0,0,0,4.06,10.65C49.16,191.53,78.51,216,128,216a130,130,0,0,0,48-8.76V240a8,8,0,0,0,16,0V199.51a115.63,115.63,0,0,0,27.94-22.57A15.91,15.91,0,0,0,224,166.29V117.87l27.76-14.81a8,8,0,0,0,0-14.12ZM128,200c-43.27,0-68.72-21.14-80-33.35V126.4l76.24,40.66a8,8,0,0,0,7.52,0L208,126.4v40.25C196.72,178.86,171.27,200,128,200Z"/></svg>'};
+function ip(n){return{robot:I.ro,cloud:I.cl,circuitry:I.ci,camera:I.ca,house:I.ho,code:I.cd}[n]||I.bf}
+var D=[{i:I.lt,k:'domain_systems'},{i:I.pl,k:'domain_electronics'},{i:I.ge,k:'domain_automation'},{i:I.br,k:'domain_ai'},{i:I.gl,k:'domain_connected'}];
+function rd(){document.getElementById('domains').innerHTML=D.map(function(d){return'<div class="dom"><div class="di">'+d.i+'</div><span>'+t(d.k)+'</span></div>'}).join('')}
+var FP=[{title:'YAKA',description:"Assistant IA local (français/anglais), stockage SQLite, analyse d'images.",icon:'robot'},{title:'Station météo ESP32',description:'Tableau de bord web temps réel avec imagerie satellite FengYun.',icon:'cloud'},{title:'LBLE',description:'Projet embarqué basé sur communication Bluetooth Low Energy.',icon:'circuitry'},{title:'Computer Vision',description:'Détection de pose animale combinant YOLO et DeepLabCut.',icon:'camera'},{title:'Maison connectée',description:"Système domotique complet : contrôle des lumières, capteurs et automatisations.",icon:'house'}];
+function rp(items){var b=document.getElementById('proj');if(!items.length){b.innerHTML='<div class="stt">'+t('projects_empty')+'</div>';return}b.innerHTML=items.map(function(p){return'<div class="card"><div class="ci">'+ip(p.icon)+'</div><div><h3>'+eh(p.title)+'</h3><p>'+eh(p.description)+'</p></div></div>'}).join('')}
+async function lp(){var b=document.getElementById('proj');b.innerHTML='<div class="stt"><div class="sp"></div>'+t('loading')+'</div>';var items=[];if(sb){try{var r=await sb.from('projects').select('*').order('order_index');if(r.data&&r.data.length)items=r.data.map(function(p){return{title:p.title||'',description:p.description||'',icon:p.icon||'code'}})}catch(e){}}if(!items.length)items=FP;rp(items)}
+var ED=[{diploma:'CEPD',dk:'edu_date_cepd',school:'EPP Akodessewa Kpota'},{diploma:'BEPC',dk:'edu_date_bepc',school:'Lycée de Bè-Kpota'},{diploma:'BAC1',dk:'edu_date_bac1',school:'CS ITEM',s:'series_f2_electronics'},{diploma:'BAC2',dk:'edu_date_bac2',school:'CS ITEM',s:'series_f2_electronics'},{diploma:'',dk:'edu_date_ongoing',school:'Accra Institute of Technology',pk:'edu_program_ee'}];
+function re(){document.getElementById('edu').innerHTML=ED.map(function(e){var title=e.pk?t(e.pk):(e.s?e.diploma+' ('+t(e.s)+')':e.diploma);return'<div class="card"><div class="ci edu">'+I.gr+'</div><div><h3>'+title+'</h3><p>'+e.school+' — '+t(e.dk)+'</p></div></div>'}).join('')}
+var ufs=true,SK=['skill_embedded','skill_electronics_automation','skill_ai_vision','skill_hw_sw_integration','skill_software_dev','skill_mobile_apps','skill_web_apps','skill_iot_connected'];
+function rfs(){document.getElementById('skills').innerHTML=SK.map(function(k){return'<div class="card sk" style="flex-direction:column;align-items:stretch"><div class="top"><span>'+t(k)+'</span></div><div class="bar"><i style="width:80%"></i></div></div>'}).join('');requestAnimationFrame(function(){document.querySelectorAll('#skills .bar i').forEach(function(el){el.style.width='80%'})})}
+async function ls(){if(sb){try{var r=await sb.from('skills').select('*').order('order_index');if(r.data&&r.data.length){ufs=false;document.getElementById('skills').innerHTML=r.data.map(function(s){var pct=Math.min(5,Math.max(0,Number(s.level)||3))/5*100;return'<div class="card sk" style="flex-direction:column;align-items:stretch"><div class="top"><span>'+eh(s.name)+'</span></div><div class="bar"><i data-w="'+pct+'"></i></div></div>'}).join('');requestAnimationFrame(function(){document.querySelectorAll('#skills .bar i').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%'})});return}}catch(e){}}rfs()}
+document.getElementById('pTabs').addEventListener('click',function(e){var b=e.target.closest('button[data-p]');if(!b)return;document.querySelectorAll('#pTabs button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');var is=b.getAttribute('data-p')==='edu';document.getElementById('pEdu').style.display=is?'block':'none';document.getElementById('pSk').style.display=is?'none':'block'});
+var am=[],dt='image';
+function pu(p){return sb?sb.storage.from(C.mediaBucket).getPublicUrl(p).data.publicUrl:''}
+function rm(){var items=am.filter(function(m){return m.type===dt});var g=document.getElementById('media');if(!items.length){g.innerHTML='<div class="stt" style="grid-column:1/-1">'+t('demos_empty')+'</div>';return}g.innerHTML=items.map(function(m){var u=pu(m.storage_path);if(m.type==='image')return'<button type="button" class="mi" data-u="'+ea(u)+'" data-ty="image"><img src="'+ea(u)+'" alt="" loading="lazy"/></button>';return'<button type="button" class="mi" data-u="'+ea(u)+'" data-ty="video"><div class="pw"><svg viewBox="0 0 256 256" fill="currentColor"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm40.55,110.58-52,32A8,8,0,0,1,104,160V96a8,8,0,0,1,12.55-6.58l52,32a8,8,0,0,1,0,13.16Z"/></svg></div></button>'}).join('')}
+document.getElementById('media').addEventListener('click',function(e){var b=e.target.closest('.mi');if(!b)return;om(b.getAttribute('data-ty'),b.getAttribute('data-u'))});
+async function lm(){var g=document.getElementById('media');g.innerHTML='<div class="stt" style="grid-column:1/-1"><div class="sp"></div>'+t('loading')+'</div>';if(sb){try{var r=await sb.from('media').select('*').order('order_index');am=(r.data||[]).map(function(m){return{title:m.title||'',type:m.type==='video'?'video':'image',storage_path:m.storage_path||''}})}catch(e){am=[]}}rm()}
+document.getElementById('dTabs').addEventListener('click',function(e){var b=e.target.closest('button[data-d]');if(!b)return;document.querySelectorAll('#dTabs button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');dt=b.getAttribute('data-d');rm()});
+function om(ty,u){var b=document.getElementById('mBody');b.innerHTML=ty==='image'?'<img src="'+ea(u)+'" alt=""/>':'<video src="'+ea(u)+'" controls autoplay playsinline></video>';document.getElementById('modal').classList.add('open')}
+function cm(){document.getElementById('modal').classList.remove('open');document.getElementById('mBody').innerHTML=''}
+document.getElementById('mClose').addEventListener('click',cm);
+document.getElementById('modal').addEventListener('click',function(e){if(e.target.id==='modal')cm()});
+document.getElementById('bEmail').addEventListener('click',function(){window.location.href='mailto:'+C.contactEmail+'?subject='+encodeURIComponent('Contact depuis le site web')});
+document.getElementById('bCall').addEventListener('click',function(){window.location.href='tel:'+C.contactPhone});
+document.getElementById('bWa').addEventListener('click',function(){window.open('https://wa.me/'+C.whatsappNumber+'?text='+encodeURIComponent('Bonjour, je vous contacte depuis votre site web.'),'_blank')});
+document.getElementById('bGh').addEventListener('click',function(){window.open(C.githubUrl,'_blank','noopener')});
+document.getElementById('bLi').addEventListener('click',function(){window.open(C.linkedinUrl,'_blank','noopener')});
+document.getElementById('bn').addEventListener('click',function(e){var b=e.target.closest('button[data-t]');if(!b)return;var i=parseInt(b.getAttribute('data-t'),10);document.querySelectorAll('#bn button').forEach(function(x){x.classList.toggle('on',parseInt(x.getAttribute('data-t'),10)===i)});document.querySelectorAll('.sc').forEach(function(s,j){s.classList.toggle('on',j===i)});var a=document.querySelector('.sc.on');document.getElementById('pt').textContent=t(a.getAttribute('data-k'));window.scrollTo({top:0,behavior:'smooth'})});
+var lm2=document.getElementById('langMenu');
+Object.keys(L).forEach(function(c){var b=document.createElement('button');b.type='button';b.textContent=L[c];b.setAttribute('data-l',c);if(c===loc)b.classList.add('on');b.addEventListener('click',function(){loc=c;lm2.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-l')===c)});lm2.classList.remove('open');ai()});lm2.appendChild(b)});
+document.getElementById('langBtn').addEventListener('click',function(e){e.stopPropagation();lm2.classList.toggle('open')});
+document.addEventListener('click',function(){lm2.classList.remove('open')});
+function eh(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function ea(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+rd();re();lp();ls();lm();ai();
+})();
+</script>
 </body>
 </html>
