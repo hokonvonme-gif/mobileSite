@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DevFolio Ads — Intelligent Systems Engineer</title>
+  <meta name="description" content="Portfolio de Têko Kossi Félix Kangni-Soukpe — Embedded systems, AI & mobile developer" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #13294B;
+      --accent: #2E6F95;
+      --bg: #F5F7FA;
+      --card: #FFFFFF;
+      --text: #1C1C1E;
+      --grey: #6B7280;
+      --success: #1E9E63;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      font-family: Inter, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100%;
+      -webkit-font-smoothing: antialiased;
+    }
+    body { padding-bottom: 80px; }
+    header {
+      position: sticky; top: 0; z-index: 40;
+      background: var(--primary); color: #fff;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    header h1 { font-size: 17px; font-weight: 600; }
+    .lang-btn {
+      background: transparent; border: none; color: #fff; cursor: pointer;
+      padding: 8px; border-radius: 50%; font-size: 20px; line-height: 1;
+    }
+    .lang-btn:hover { background: rgba(255,255,255,.12); }
+    .lang-menu {
+      position: absolute; right: 12px; top: 52px;
+      background: #fff; color: var(--text); border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12); max-height: 280px; overflow-y: auto;
+      width: 180px; z-index: 50; display: none;
+    }
+    .lang-menu.open { display: block; }
+    .lang-menu button {
+      display: block; width: 100%; text-align: left; padding: 10px 16px;
+      border: none; background: none; font-size: 14px; cursor: pointer;
+    }
+    .lang-menu button:hover, .lang-menu button.active { background: var(--bg); color: var(--primary); font-weight: 600; }
+    main { max-width: 640px; margin: 0 auto; padding: 20px 16px; }
+    .screen { display: none; animation: fadeIn .25s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    /* Home hero */
+    .hero {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 20px; padding: 24px; color: #fff; margin-bottom: 20px;
+    }
+    .hero-top { display: flex; align-items: center; gap: 14px; }
+    .avatar {
+      width: 64px; height: 64px; border-radius: 16px; overflow: hidden;
+      background: rgba(255,255,255,.15); flex-shrink: 0; position: relative;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar .fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; }
+    .hero-name { font-weight: 700; font-size: 15px; }
+    .hero-first { color: rgba(255,255,255,.7); font-size: 13px; margin-top: 4px; }
+    .hero h2 { font-size: 20px; font-weight: 700; margin-top: 16px; line-height: 1.3; }
+    .hero .bio { color: rgba(255,255,255,.75); font-size: 14px; line-height: 1.45; margin-top: 10px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.15); border-radius: 20px;
+      padding: 6px 12px; margin-top: 16px; font-size: 12px; font-weight: 600;
+    }
+    .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+
+    .info-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 14px; }
+    .info-row .label { color: var(--grey); font-weight: 600; }
+    .section-title { font-size: 18px; font-weight: 700; margin: 20px 0 12px; }
+
+    .domains { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; }
+    .domain-card {
+      background: var(--card); border-radius: 18px; padding: 14px 8px;
+      text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,.05);
+      height: 128px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .domain-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; margin-bottom: 10px;
+    }
+    .domain-card span { font-size: 11.5px; font-weight: 600; line-height: 1.25; }
+
+    /* Cards */
+    .card {
+      background: var(--card); border-radius: 16px; padding: 16px 18px;
+      margin-bottom: 12px; border: 1px solid rgba(0,0,0,.05);
+      display: flex; gap: 14px; align-items: flex-start;
+      box-shadow: 0 2px 8px rgba(0,0,0,.03);
+    }
+    .card-icon {
+      width: 48px; height: 48px; border-radius: 50%; background: var(--primary);
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; flex-shrink: 0;
+    }
+    .card h3 { font-size: 16px; font-weight: 700; }
+    .card p { color: var(--grey); font-size: 14px; line-height: 1.4; margin-top: 6px; }
+
+    /* Tabs */
+    .tabs { display: flex; background: #fff; border-radius: 12px; padding: 4px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+    .tabs button {
+      flex: 1; border: none; background: none; padding: 10px; border-radius: 10px;
+      font-size: 14px; font-weight: 500; color: var(--grey); cursor: pointer;
+    }
+    .tabs button.active { background: var(--primary); color: #fff; }
+
+    .edu-icon {
+      width: 40px; height: 40px; border-radius: 10px; background: rgba(46,111,149,.1);
+      display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 20px; flex-shrink: 0;
+    }
+    .skill-bar { height: 6px; background: rgba(19,41,75,.08); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+    .skill-bar span { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .6s ease; }
+
+    .lock-banner {
+      display: flex; align-items: center; gap: 8px; background: rgba(19,41,75,.06);
+      color: var(--primary); font-size: 12px; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px;
+    }
+    .grid-media { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (min-width: 500px) { .grid-media { grid-template-columns: 1fr 1fr 1fr; } }
+    .media-item {
+      aspect-ratio: 0.9; border-radius: 14px; overflow: hidden; background: rgba(19,41,75,.08);
+      position: relative; cursor: pointer; border: none; padding: 0;
+    }
+    .media-item img { width: 100%; height: 100%; object-fit: cover; }
+    .media-item .play {
+      position: absolute; inset: 0; background: var(--primary); display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 36px;
+    }
+
+    .contact-btn {
+      display: flex; align-items: center; gap: 14px; width: 100%;
+      background: var(--card); border: 1px solid rgba(0,0,0,.05); border-radius: 14px;
+      padding: 16px; margin-bottom: 12px; cursor: pointer; text-align: left;
+      box-shadow: 0 2px 8px rgba(0,0,0,.03); transition: transform .15s, box-shadow .15s;
+    }
+    .contact-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+    .contact-btn .ico {
+      width: 40px; height: 40px; border-radius: 10px; background: rgba(19,41,75,.08);
+      display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px;
+    }
+    .contact-btn span { font-weight: 600; font-size: 15px; flex: 1; }
+    .contact-btn .arrow { color: var(--grey); }
+
+    .loading { text-align: center; padding: 48px 0; color: var(--grey); }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid rgba(19,41,75,.15);
+      border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; color: var(--grey); padding: 40px 0; }
+
+    /* Bottom nav */
+    nav.bottom {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+      background: #fff; height: 72px; display: flex;
+      box-shadow: 0 -2px 8px rgba(0,0,0,.06); border-top: 1px solid rgba(0,0,0,.04);
+    }
+    nav.bottom button {
+      flex: 1; border: none; background: none; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: var(--grey); font-size: 10.5px;
+    }
+    nav.bottom button.active { color: var(--primary); font-weight: 600; }
+    nav.bottom button .ico { font-size: 22px; line-height: 1; }
+
+    /* Modal */
+    .modal {
+      display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.9);
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal.open { display: flex; }
+    .modal .close {
+      position: absolute; top: 16px; right: 20px; color: #fff; font-size: 32px;
+      background: none; border: none; cursor: pointer; line-height: 1;
+    }
+    .modal img, .modal video { max-width: 100%; max-height: 85vh; border-radius: 8px; }
+
+    @media (min-width: 768px) {
+      body { padding-bottom: 100px; }
+      nav.bottom {
+        left: 50%; transform: translateX(-50%); bottom: 24px; width: auto;
+        height: auto; border-radius: 16px; padding: 6px; gap: 4px;
+        box-shadow: 0 8px 32px rgba(0,0,0,.12);
+      }
+      nav.bottom button {
+        flex-direction: row; gap: 8px; padding: 10px 16px; border-radius: 12px;
+        font-size: 13px; width: auto;
+      }
+      nav.bottom button.active { background: var(--primary); color: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="pageTitle">Accueil</h1>
+    <div style="position:relative">
+      <button class="lang-btn" id="langBtn" title="Langue">🌐</button>
+      <div class="lang-menu" id="langMenu"></div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <div class="screen active" id="screen0">
+      <div class="hero">
+        <div class="hero-top">
+          <div class="avatar">
+            <img id="profileImg" src="https://raw.githubusercontent.com/hokonvonme-gif/cv-perso/main/IMG_20260708_222543.jpg" alt="Profil" onerror="this.style.display='none'" />
+            <div class="fallback">TK</div>
+          </div>
+          <div>
+            <div class="hero-name"><span data-i18n="label_lastname">Nom</span> : KANGNI-SOUKPE</div>
+            <div class="hero-first"><span data-i18n="label_firstnames">Prénoms</span> : Têko Kossi Félix</div>
+          </div>
+        </div>
+        <h2 data-i18n="role_title">Ingénieur systèmes intelligents — Développeur embarqué & IA</h2>
+        <p class="bio" data-i18n="bio">Je conçois des solutions complètes alliant systèmes embarqués, applications mobiles et intelligence artificielle, de l'électronique jusqu'au cloud.</p>
+        <div class="badge" id="availBadge">
+          <span class="dot"></span>
+          <span data-i18n="availability_status">Disponible pour projets freelance</span>
+        </div>
+      </div>
+      <div class="info-row">
+        <span>📍</span>
+        <span class="label" data-i18n="location_label">Localisation</span> :
+        <span>Accra, Ghana</span>
+      </div>
+      <div class="info-row">
+        <span>💬</span>
+        <span class="label" data-i18n="languages_label">Langues parlées</span> :
+        <span data-i18n="spoken_languages_value">Français, Anglais</span>
+      </div>
+      <h3 class="section-title" data-i18n="domains_title">Domaines d'expertise</h3>
+      <div class="domains" id="domains"></div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="screen" id="screen1">
+      <div id="projectsList"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="screen" id="screen2">
+      <div class="tabs">
+        <button class="active" data-sub="edu" data-i18n="education_title">Formation</button>
+        <button data-sub="skills" data-i18n="skills_title">Mes compétences</button>
+      </div>
+      <div id="eduPanel">
+        <p style="color:var(--grey);font-size:13px;margin-bottom:14px" data-i18n="education_subtitle">Diplômes, écoles/universités, dates</p>
+        <div id="eduList"></div>
+      </div>
+      <div id="skillsPanel" style="display:none">
+        <div id="skillsList"></div>
+      </div>
+    </div>
+
+    <!-- DEMOS -->
+    <div class="screen" id="screen3">
+      <div class="lock-banner">🔒 <span data-i18n="demos_view_only">Contenu en lecture seule — téléchargement désactivé.</span></div>
+      <div class="tabs">
+        <button class="active" data-demo="photos" data-i18n="demos_tab_photos">Photos</button>
+        <button data-demo="videos" data-i18n="demos_tab_videos">Vidéos</button>
+      </div>
+      <div id="mediaGrid" class="grid-media"></div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="screen" id="screen4">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:8px" data-i18n="contact_title">Restons en contact</h2>
+      <p style="color:var(--grey);margin-bottom:24px" data-i18n="contact_subtitle">Un projet en tête ? Contactez-moi via l'un de ces canaux.</p>
+      <button class="contact-btn" onclick="openEmail()"><div class="ico">✉️</div><span data-i18n="contact_button_email">Envoyer un email</span><span class="arrow">›</span></button>
+      <button class="contact-btn" onclick="openDialer()"><div class="ico">📞</div><span data-i18n="contact_button_call">Appeler</span><span class="arrow">›</span></button>
+      <button class="contact-btn" onclick="openWhatsApp()"><div class="ico">💬</div><span data-i18n="contact_button_whatsapp">WhatsApp</span><span class="arrow">›</span></button>
+      <button class="contact-btn" onclick="window.open(CFG.githubUrl,'_blank')"><div class="ico">🐙</div><span data-i18n="contact_button_github">GitHub</span><span class="arrow">›</span></button>
+      <button class="contact-btn" onclick="window.open(CFG.linkedinUrl,'_blank')"><div class="ico">💼</div><span data-i18n="contact_button_linkedin">LinkedIn</span><span class="arrow">›</span></button>
+    </div>
+  </main>
+
+  <nav class="bottom" id="bottomNav">
+    <button class="active" data-tab="0"><span class="ico">🏠</span><span data-nav="nav_home">Accueil</span></button>
+    <button data-tab="1"><span class="ico">💼</span><span data-nav="nav_projects">Projets</span></button>
+    <button data-tab="2"><span class="ico">🔧</span><span data-nav="nav_skills">Profil</span></button>
+    <button data-tab="3"><span class="ico">🎬</span><span data-nav="nav_demos">Démos</span></button>
+    <button data-tab="4"><span class="ico">✉️</span><span data-nav="nav_contact">Contact</span></button>
+  </nav>
+
+  <div class="modal" id="modal">
+    <button class="close" onclick="closeModal()">×</button>
+    <div id="modalContent"></div>
+  </div>
+
+  <script>
+    /* ========== CONFIG (mêmes valeurs que l'app Flutter) ========== */
+    const CFG = {
+      supabaseUrl: 'https://mcxtihnpyvxwdgkwzvav.supabase.co',
+      supabaseAnonKey: 'sb_publishable_AtW6KMEUNH0e6lLYzFwImA_n9cSwqDr',
+      mediaBucket: 'demos',
+      contactEmail: 'tekokossifelixkangnisoukpe5@gmail.com',
+      contactPhone: '+223244390900',
+      whatsappNumber: '244390900',
+      githubUrl: 'https://github.com/vondchatmaon-ui',
+      linkedinUrl: 'https://www.linkedin.com/in/ton-profil',
+      location: 'Accra, Ghana',
+      isAvailableForFreelance: true,
+    };
+
+    const supabase = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
+
+    /* ========== TRADUCTIONS ========== */
+    const LANGS = {
+      fr: 'Français', en: 'English', es: 'Español', pt: 'Português', de: 'Deutsch',
+      it: 'Italiano', ar: 'العربية', zh: '中文', ru: 'Русский', sw: 'Kiswahili',
+      tr: 'Türkçe', hi: 'हिन्दी', ha: 'Hausa', yo: 'Yorùbá', ee: 'Eʋegbe',
+    };
+
+    const I18N = {
+      fr: {
+        nav_home:'Accueil', nav_projects:'Projets', nav_skills:'Profil', nav_demos:'Démos', nav_contact:'Contact',
+        role_title:'Ingénieur systèmes intelligents — Développeur embarqué & IA',
+        bio:"Je conçois des solutions complètes alliant systèmes embarqués, applications mobiles et intelligence artificielle, de l'électronique jusqu'au cloud.",
+        availability_status:'Disponible pour projets freelance', location_label:'Localisation', languages_label:'Langues parlées',
+        domains_title:"Domaines d'expertise", skills_title:'Mes compétences', projects_empty:'Aucun projet à afficher pour le moment.',
+        demos_tab_photos:'Photos', demos_tab_videos:'Vidéos', demos_view_only:'Contenu en lecture seule — téléchargement désactivé.', demos_empty:'Aucune démonstration disponible pour le moment.',
+        contact_title:'Restons en contact', contact_subtitle:"Un projet en tête ? Contactez-moi via l'un de ces canaux.",
+        contact_button_email:'Envoyer un email', contact_button_call:'Appeler', contact_button_whatsapp:'WhatsApp', contact_button_github:'GitHub', contact_button_linkedin:'LinkedIn',
+        loading:'Chargement...', domain_systems:'Systèmes intelligents', domain_electronics:'Électronique embarquée', domain_automation:'Automatisation', domain_ai:'Intelligence artificielle', domain_connected:'Technologies connectées',
+        label_lastname:'Nom', label_firstnames:'Prénoms', education_title:'Formation', education_subtitle:'Diplômes, écoles/universités, dates',
+        spoken_languages_value:'Français, Anglais', series_f2_electronics:'F2 - Électronique', edu_program_ee:'1ère année Génie Électrique',
+        edu_date_cepd:'Juillet 2017', edu_date_bepc:'Juillet 2021', edu_date_bac1:'Mai 2023', edu_date_bac2:'Juin 2024', edu_date_ongoing:'En cours',
+        skill_embedded:'Systèmes embarqués', skill_electronics_automation:'Électronique & automatisation', skill_ai_vision:'IA & vision par ordinateur', skill_hw_sw_integration:'Intégration matériel / logiciel',
+        skill_software_dev:'Développement logiciel', skill_mobile_apps:'Applications mobiles', skill_web_apps:'Applications web', skill_iot_connected:'IoT & systèmes connectés',
+      },
+      en: {
+        nav_home:'Home', nav_projects:'Projects', nav_skills:'Profile', nav_demos:'Demos', nav_contact:'Contact',
+        role_title:'Intelligent Systems Engineer — Embedded & AI Developer',
+        bio:'I build end-to-end solutions spanning embedded systems, mobile apps, and artificial intelligence, from the electronics up to the cloud.',
+        availability_status:'Available for freelance projects', location_label:'Location', languages_label:'Languages spoken',
+        domains_title:'Areas of expertise', skills_title:'My Skills', projects_empty:'No projects to show yet.',
+        demos_tab_photos:'Photos', demos_tab_videos:'Videos', demos_view_only:'View-only content — downloading is disabled.', demos_empty:'No demos available yet.',
+        contact_title:"Let's connect", contact_subtitle:'Have a project in mind? Reach out through any of these channels.',
+        contact_button_email:'Send an email', contact_button_call:'Call', contact_button_whatsapp:'WhatsApp', contact_button_github:'GitHub', contact_button_linkedin:'LinkedIn',
+        loading:'Loading...', domain_systems:'Intelligent systems', domain_electronics:'Embedded electronics', domain_automation:'Automation', domain_ai:'Artificial intelligence', domain_connected:'Connected technologies',
+        label_lastname:'Last name', label_firstnames:'First names', education_title:'Education', education_subtitle:'Diplomas, schools/universities, dates',
+        spoken_languages_value:'French, English', series_f2_electronics:'F2 - Electronics', edu_program_ee:'1st year Electrical Engineering',
+        edu_date_cepd:'July 2017', edu_date_bepc:'July 2021', edu_date_bac1:'May 2023', edu_date_bac2:'June 2024', edu_date_ongoing:'Ongoing',
+        skill_embedded:'Embedded systems', skill_electronics_automation:'Electronics & automation', skill_ai_vision:'AI & computer vision', skill_hw_sw_integration:'Hardware / software integration',
+        skill_software_dev:'Software development', skill_mobile_apps:'Mobile applications', skill_web_apps:'Web applications', skill_iot_connected:'IoT & connected systems',
+      },
+    };
+    // Autres langues → anglais
+    Object.keys(LANGS).forEach(l => { if (!I18N[l]) I18N[l] = I18N.en; });
+
+    let locale = 'fr';
+    function t(key) { return (I18N[locale] && I18N[locale][key]) || I18N.en[key] || key; }
+
+    function applyI18n() {
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+      document.querySelectorAll('[data-nav]').forEach(el => { el.textContent = t(el.getAttribute('data-nav')); });
+      const titles = [t('nav_home'), t('nav_projects'), t('nav_skills'), t('nav_demos'), t('nav_contact')];
+      document.getElementById('pageTitle').textContent = titles[currentTab];
+      renderDomains();
+      if (document.getElementById('eduList').children.length) renderEducation();
+      if (usingFallbackSkills) renderFallbackSkills();
+    }
+
+    /* ========== NAV ========== */
+    let currentTab = 0;
+    document.getElementById('bottomNav').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-tab]');
+      if (!btn) return;
+      currentTab = +btn.dataset.tab;
+      document.querySelectorAll('#bottomNav button').forEach(b => b.classList.toggle('active', +b.dataset.tab === currentTab));
+      document.querySelectorAll('.screen').forEach((s, i) => s.classList.toggle('active', i === currentTab));
+      document.getElementById('pageTitle').textContent = [t('nav_home'), t('nav_projects'), t('nav_skills'), t('nav_demos'), t('nav_contact')][currentTab];
+    });
+
+    /* ========== LANG ========== */
+    const langMenu = document.getElementById('langMenu');
+    Object.entries(LANGS).forEach(([code, name]) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.onclick = () => { locale = code; langMenu.classList.remove('open'); applyI18n(); };
+      langMenu.appendChild(b);
+    });
+    document.getElementById('langBtn').onclick = () => langMenu.classList.toggle('open');
+    document.addEventListener('click', e => { if (!e.target.closest('#langBtn') && !e.target.closest('#langMenu')) langMenu.classList.remove('open'); });
+
+    /* ========== HOME DOMAINS ========== */
+    const DOMAINS = [
+      { icon: '⚡', key: 'domain_systems' },
+      { icon: '🔌', key: 'domain_electronics' },
+      { icon: '⚙️', key: 'domain_automation' },
+      { icon: '🧠', key: 'domain_ai' },
+      { icon: '🌐', key: 'domain_connected' },
+    ];
+    function renderDomains() {
+      document.getElementById('domains').innerHTML = DOMAINS.map(d =>
+        `<div class="domain-card"><div class="domain-icon">${d.icon}</div><span>${t(d.key)}</span></div>`
+      ).join('');
+    }
+
+    /* ========== PROJECTS ========== */
+    const FALLBACK_PROJECTS = [
+      { title: 'YAKA', description: "Assistant IA local (français/anglais), stockage SQLite, analyse d'images.", icon: '🤖' },
+      { title: 'Station météo ESP32', description: 'Tableau de bord web temps réel avec imagerie satellite FengYun.', icon: '☁️' },
+      { title: 'LBLE', description: 'Projet embarqué basé sur communication Bluetooth Low Energy.', icon: '📡' },
+      { title: 'Computer Vision', description: 'Détection de pose animale combinant YOLO et DeepLabCut.', icon: '📷' },
+      { title: 'Maison connectée', description: "Système domotique complet : contrôle des lumières, capteurs et automatisations.", icon: '🏠' },
+    ];
+    async function loadProjects() {
+      const box = document.getElementById('projectsList');
+      box.innerHTML = `<div class="loading"><div class="spinner"></div>${t('loading')}</div>`;
+      let items = [];
+      try {
+        const { data } = await supabase.from('projects').select('*').order('order_index');
+        if (data && data.length) items = data.map(p => ({ title: p.title, description: p.description, icon: '💼' }));
+      } catch (_) {}
+      if (!items.length) items = FALLBACK_PROJECTS;
+      box.innerHTML = items.map(p =>
+        `<div class="card"><div class="card-icon">${p.icon || '💼'}</div><div><h3>${p.title}</h3><p>${p.description}</p></div></div>`
+      ).join('');
+    }
+
+    /* ========== EDUCATION ========== */
+    const EDUCATION = [
+      { diploma: 'CEPD', dateKey: 'edu_date_cepd', school: 'EPP Akodessewa Kpota' },
+      { diploma: 'BEPC', dateKey: 'edu_date_bepc', school: 'Lycée de Bè-Kpota' },
+      { diploma: 'BAC1', dateKey: 'edu_date_bac1', school: 'CS ITEM', series: 'series_f2_electronics' },
+      { diploma: 'BAC2', dateKey: 'edu_date_bac2', school: 'CS ITEM', series: 'series_f2_electronics' },
+      { diploma: '', dateKey: 'edu_date_ongoing', school: 'Accra Institute of Technology', programKey: 'edu_program_ee' },
+    ];
+    function renderEducation() {
+      document.getElementById('eduList').innerHTML = EDUCATION.map(e => {
+        const title = e.programKey ? t(e.programKey) : (e.series ? `${e.diploma} (${t(e.series)})` : e.diploma);
+        return `<div class="card"><div class="edu-icon">🎓</div><div><h3 style="font-size:15px">${title}</h3><p style="margin-top:4px;font-size:13px">${e.school} — ${t(e.dateKey)}</p></div></div>`;
+      }).join('');
+    }
+
+    /* ========== SKILLS ========== */
+    let usingFallbackSkills = true;
+    const SKILL_KEYS = ['skill_embedded','skill_electronics_automation','skill_ai_vision','skill_hw_sw_integration','skill_software_dev','skill_mobile_apps','skill_web_apps','skill_iot_connected'];
+    function renderFallbackSkills() {
+      document.getElementById('skillsList').innerHTML = SKILL_KEYS.map(k =>
+        `<div class="card" style="flex-direction:column;align-items:stretch"><div style="font-weight:600;font-size:15px">${t(k)}</div><div class="skill-bar"><span style="width:80%"></span></div></div>`
+      ).join('');
+    }
+    async function loadSkills() {
+      try {
+        const { data } = await supabase.from('skills').select('*').order('order_index');
+        if (data && data.length) {
+          usingFallbackSkills = false;
+          document.getElementById('skillsList').innerHTML = data.map(s => {
+            const pct = Math.min(5, Math.max(0, s.level || 3)) / 5 * 100;
+            return `<div class="card" style="flex-direction:column;align-items:stretch"><div style="font-weight:600;font-size:15px">${s.name}</div><div class="skill-bar"><span style="width:${pct}%"></span></div></div>`;
+          }).join('');
+          return;
+        }
+      } catch (_) {}
+      renderFallbackSkills();
+    }
+
+    /* Profile sub-tabs */
+    document.querySelectorAll('#screen2 .tabs button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#screen2 .tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const isEdu = btn.dataset.sub === 'edu';
+        document.getElementById('eduPanel').style.display = isEdu ? 'block' : 'none';
+        document.getElementById('skillsPanel').style.display = isEdu ? 'none' : 'block';
+      };
+    });
+
+    /* ========== DEMOS ========== */
+    let allMedia = [];
+    let demoMode = 'photos';
+    async function loadMedia() {
+      const grid = document.getElementById('mediaGrid');
+      grid.innerHTML = `<div class="loading" style="grid-column:1/-1"><div class="spinner"></div>${t('loading')}</div>`;
+      try {
+        const { data } = await supabase.from('media').select('*').order('order_index');
+        allMedia = data || [];
+      } catch (_) { allMedia = []; }
+      renderMedia();
+    }
+    function publicUrl(path) {
+      return supabase.storage.from(CFG.mediaBucket).getPublicUrl(path).data.publicUrl;
+    }
+    function renderMedia() {
+      const items = allMedia.filter(m => m.type === (demoMode === 'photos' ? 'image' : 'video'));
+      const grid = document.getElementById('mediaGrid');
+      if (!items.length) {
+        grid.innerHTML = `<p class="empty" style="grid-column:1/-1">${t('demos_empty')}</p>`;
+        return;
+      }
+      grid.innerHTML = items.map(m => {
+        const url = publicUrl(m.storage_path);
+        if (m.type === 'image') {
+          return `<button class="media-item" onclick="openModal('image','${url}')"><img src="${url}" alt="" loading="lazy" /></button>`;
+        }
+        return `<button class="media-item" onclick="openModal('video','${url}')"><div class="play">▶</div></button>`;
+      }).join('');
+    }
+    document.querySelectorAll('#screen3 .tabs button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#screen3 .tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        demoMode = btn.dataset.demo;
+        renderMedia();
+      };
+    });
+
+    function openModal(type, url) {
+      const c = document.getElementById('modalContent');
+      c.innerHTML = type === 'image'
+        ? `<img src="${url}" alt="" />`
+        : `<video src="${url}" controls autoplay style="max-width:100%;max-height:85vh;border-radius:8px"></video>`;
+      document.getElementById('modal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('modal').classList.remove('open'); document.getElementById('modalContent').innerHTML = ''; }
+    document.getElementById('modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
+
+    /* ========== CONTACT ========== */
+    function openEmail() { window.location.href = `mailto:${CFG.contactEmail}?subject=${encodeURIComponent('Contact depuis le site web')}`; }
+    function openDialer() { window.location.href = `tel:${CFG.contactPhone}`; }
+    function openWhatsApp() { window.open(`https://wa.me/${CFG.whatsappNumber}?text=${encodeURIComponent('Bonjour, je vous contacte depuis votre site web.')}`, '_blank'); }
+
+    /* ========== INIT ========== */
+    renderDomains();
+    renderEducation();
+    loadProjects();
+    loadSkills();
+    loadMedia();
+    applyI18n();
+  </script>
+</body>
+</html>
