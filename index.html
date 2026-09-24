@@ -284,10 +284,24 @@ document.getElementById('dTabs').addEventListener('click',function(e){
 function cm(){document.getElementById('modal').classList.remove('open');document.getElementById('mBody').innerHTML=''}
 document.getElementById('mClose').addEventListener('click',cm);
 document.getElementById('modal').addEventListener('click',function(e){if(e.target.id==='modal')cm()});
-function openLink(url){var a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';document.body.appendChild(a);a.click();setTimeout(function(){try{document.body.removeChild(a)}catch(e){}},200)}
-function openMail(){openLink('mailto:'+C.contactEmail+'?subject='+encodeURIComponent('Contact depuis le site web'))}
-
-document.getElementById('bEmail').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openMail()});
+function openLink(url){
+  var a=document.createElement('a');
+  a.href=url;
+  a.target='_blank';
+  a.rel='noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){try{document.body.removeChild(a)}catch(e){}},200);
+}
+function openMail(){
+  /* Ne PAS utiliser target=_blank : Chrome ouvre un onglet blanc avec mailto: */
+  window.location.href='mailto:'+C.contactEmail+'?subject='+encodeURIComponent('Contact depuis le site web');
+}
+document.getElementById('bEmail').addEventListener('click',function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  openMail();
+});
 document.getElementById('bWa').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openLink('https://wa.me/'+C.whatsappNumber+'?text='+encodeURIComponent('Bonjour, je vous contacte depuis votre site web.'))});
 document.getElementById('bGh').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openLink(C.githubUrl)});
 document.getElementById('bLi').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openLink(C.linkedinUrl)});
